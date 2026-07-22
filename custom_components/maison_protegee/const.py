@@ -2,7 +2,6 @@ DOMAIN = "maison_protegee"
 DEFAULT_TIMEOUT = 60
 
 CONF_ENABLE_ALARM_PANEL = "enable_alarm_panel"
-CONF_ENABLE_TEMPERATURES = "enable_temperatures"
 CONF_ENABLE_EQUIPMENT = "enable_equipment"
 CONF_ENABLE_EVENTS = "enable_events"
 CONF_ENABLE_DIAGNOSTICS = "enable_diagnostics"

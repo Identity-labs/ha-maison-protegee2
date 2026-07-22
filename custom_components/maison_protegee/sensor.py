@@ -12,12 +12,11 @@ from homeassistant.const import PERCENTAGE, UnitOfTemperature
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .api import EquipmentDevice, EquipmentSensor, EventRecord, MaisonProtegeeAPI
+from .api import EquipmentDevice, EventRecord, MaisonProtegeeAPI
 from .const import (
     CONF_ENABLE_DIAGNOSTICS,
     CONF_ENABLE_EQUIPMENT,
     CONF_ENABLE_EVENTS,
-    CONF_ENABLE_TEMPERATURES,
     DOMAIN,
 )
 from .coordinator import EquipmentCoordinator, EventsCoordinator, GatewayCoordinator
@@ -46,35 +45,26 @@ async def async_setup_entry(
         )
 
     equipment_coordinator: EquipmentCoordinator | None = runtime.get("equipment_coordinator")
-    if equipment_coordinator is not None:
-        if entry.data.get(CONF_ENABLE_TEMPERATURES, True):
-            for reading in equipment_coordinator.data.zone_temperatures:
+    if equipment_coordinator is not None and entry.data.get(CONF_ENABLE_EQUIPMENT, True):
+        for device in equipment_coordinator.data.devices:
+            if device.battery is not None:
                 entities.append(
-                    MaisonProtegeeTemperatureSensor(
-                        equipment_coordinator, entry, api, reading
+                    MaisonProtegeeBatterySensor(
+                        equipment_coordinator, entry, api, device
                     )
                 )
-
-        if entry.data.get(CONF_ENABLE_EQUIPMENT, True):
-            for device in equipment_coordinator.data.devices:
-                if device.battery is not None:
-                    entities.append(
-                        MaisonProtegeeBatterySensor(
-                            equipment_coordinator, entry, api, device
-                        )
+            if device.signal_wifi is not None:
+                entities.append(
+                    MaisonProtegeeSignalWifiSensor(
+                        equipment_coordinator, entry, api, device
                     )
-                if device.signal_wifi is not None:
-                    entities.append(
-                        MaisonProtegeeSignalWifiSensor(
-                            equipment_coordinator, entry, api, device
-                        )
+                )
+            if device.temperature is not None:
+                entities.append(
+                    MaisonProtegeeDeviceTemperatureSensor(
+                        equipment_coordinator, entry, api, device
                     )
-                if device.temperature is not None:
-                    entities.append(
-                        MaisonProtegeeDeviceTemperatureSensor(
-                            equipment_coordinator, entry, api, device
-                        )
-                    )
+                )
 
     if entry.data.get(CONF_ENABLE_EVENTS, True):
         events_coordinator: EventsCoordinator = runtime["events_coordinator"]
@@ -115,31 +105,6 @@ class MaisonProtegeeGatewaySensor(MaisonProtegeeEntity, SensorEntity):
     @property
     def extra_state_attributes(self) -> dict:
         return {"gateway_type": self._api.gateway_type}
-
-
-class MaisonProtegeeTemperatureSensor(MaisonProtegeeEntity, SensorEntity):
-    _attr_device_class = SensorDeviceClass.TEMPERATURE
-    _attr_state_class = SensorStateClass.MEASUREMENT
-    _attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
-
-    def __init__(
-        self,
-        coordinator: EquipmentCoordinator,
-        entry: ConfigEntry,
-        api: MaisonProtegeeAPI,
-        reading: EquipmentSensor,
-    ) -> None:
-        super().__init__(coordinator, entry, api)
-        self._reading_id = reading.unique_id
-        self._attr_unique_id = f"{entry.entry_id}_temp_{reading.unique_id}"
-        self._attr_name = reading.name
-
-    @property
-    def native_value(self) -> float | None:
-        for reading in self.coordinator.data.zone_temperatures:
-            if reading.unique_id == self._reading_id:
-                return reading.value
-        return None
 
 
 class MaisonProtegeeBatterySensor(MaisonProtegeeEquipmentEntity, SensorEntity):

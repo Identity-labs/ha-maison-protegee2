@@ -16,7 +16,6 @@ from .const import (
     CONF_ENABLE_DIAGNOSTICS,
     CONF_ENABLE_EQUIPMENT,
     CONF_ENABLE_EVENTS,
-    CONF_ENABLE_TEMPERATURES,
     DOMAIN,
 )
 
@@ -31,7 +30,6 @@ DATA_SCHEMA = vol.Schema(
         vol.Required(CONF_USERNAME): str,
         vol.Required(CONF_PASSWORD): str,
         vol.Optional(CONF_ENABLE_ALARM_PANEL, default=True): bool,
-        vol.Optional(CONF_ENABLE_TEMPERATURES, default=True): bool,
         vol.Optional(CONF_ENABLE_EQUIPMENT, default=True): bool,
         vol.Optional(CONF_ENABLE_EVENTS, default=True): bool,
         vol.Optional(CONF_ENABLE_DIAGNOSTICS, default=True): bool,
@@ -162,10 +160,11 @@ def _merge_options(
     if password is not None:
         updated[CONF_PASSWORD] = password
     updated[CONF_ENABLE_ALARM_PANEL] = user_input.get(CONF_ENABLE_ALARM_PANEL, True)
-    updated[CONF_ENABLE_TEMPERATURES] = user_input.get(CONF_ENABLE_TEMPERATURES, True)
     updated[CONF_ENABLE_EQUIPMENT] = user_input.get(CONF_ENABLE_EQUIPMENT, True)
     updated[CONF_ENABLE_EVENTS] = user_input.get(CONF_ENABLE_EVENTS, True)
     updated[CONF_ENABLE_DIAGNOSTICS] = user_input.get(CONF_ENABLE_DIAGNOSTICS, True)
+    # Drop legacy hub zone-temperature option; temps live on equipment devices.
+    updated.pop("enable_temperatures", None)
     return updated
 
 
@@ -178,10 +177,6 @@ def _options_schema(config_entry: config_entries.ConfigEntry) -> vol.Schema:
             vol.Optional(
                 CONF_ENABLE_ALARM_PANEL,
                 default=data.get(CONF_ENABLE_ALARM_PANEL, True),
-            ): bool,
-            vol.Optional(
-                CONF_ENABLE_TEMPERATURES,
-                default=data.get(CONF_ENABLE_TEMPERATURES, True),
             ): bool,
             vol.Optional(
                 CONF_ENABLE_EQUIPMENT,

@@ -8,8 +8,7 @@
           "username": "Customer ID or email",
           "password": "Password",
           "enable_alarm_panel": "Alarm control panel (requires gateway)",
-          "enable_temperatures": "Room temperature sensors",
-          "enable_equipment": "Per-device battery, signal, connection, and status",
+          "enable_equipment": "Per-device battery, signal, temperature, connection, and status",
           "enable_events": "Latest event sensor + bus events",
           "enable_diagnostics": "Contract and gateway diagnostic sensors"
         }
@@ -34,8 +33,7 @@
           "username": "Customer ID or email",
           "password": "Password (leave empty to keep current)",
           "enable_alarm_panel": "Alarm control panel",
-          "enable_temperatures": "Temperature sensors",
-          "enable_equipment": "Equipment sensors (battery, signal, status)",
+          "enable_equipment": "Equipment sensors (battery, signal, temperature, status)",
           "enable_events": "Event sensor + bus events",
           "enable_diagnostics": "Diagnostic sensors"
         }
