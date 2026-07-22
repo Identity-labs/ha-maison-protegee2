@@ -1,3 +1,8 @@
-grpcio>=1.62.0,<1.76
+# Runtime (CLI / local). Home Assistant already pins grpcio + protobuf;
+# the HA manifest only declares grpcio>=1.62.0 so it stays resolvable.
+grpcio>=1.62.0
 protobuf>=6.31.0,<7
+
+# Dev only — keep grpcio-tools on the 6.x protoc line for HA-compatible stubs.
+# Do not bump past 1.75.x when regenerating (see scripts/generate_proto.sh).
 grpcio-tools>=1.70.0,<1.76
