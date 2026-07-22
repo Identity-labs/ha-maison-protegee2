@@ -1,0 +1,18 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+.env
+*.mitm
+.DS_Store
+.pytest_cache/
+.mypy_cache/
+
+# Large reverse-engineering artifacts (keep outside git or use Git LFS)
+com.orange.fr.protegee2_5.9/
+com.orange.fr.protegee2_5.9.xapk
+tools/

@@ -1,0 +1,80 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Maison Protégée",
+        "description": "Connect using the same credentials as the mobile app (gRPC API).",
+        "data": {
+          "username": "Customer ID or email",
+          "password": "Password",
+          "enable_alarm_panel": "Alarm control panel (requires gateway)",
+          "enable_temperatures": "Room temperature sensors",
+          "enable_equipment": "Per-device battery, signal, connection, and status",
+          "enable_events": "Latest event sensor + bus events",
+          "enable_diagnostics": "Contract and gateway diagnostic sensors"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Unable to connect. Check your network.",
+      "invalid_auth": "Invalid credentials.",
+      "password_required": "Password is required.",
+      "no_contract": "Login succeeded but no contract was found.",
+      "unknown": "Unexpected error."
+    },
+    "abort": {
+      "already_configured": "Already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Maison Protégée options",
+        "data": {
+          "username": "Customer ID or email",
+          "password": "Password (leave empty to keep current)",
+          "enable_alarm_panel": "Alarm control panel",
+          "enable_temperatures": "Temperature sensors",
+          "enable_equipment": "Equipment sensors (battery, signal, status)",
+          "enable_events": "Event sensor + bus events",
+          "enable_diagnostics": "Diagnostic sensors"
+        }
+      }
+    }
+  },
+  "entity": {
+    "alarm_control_panel": {
+      "alarm_panel": {
+        "name": "Alarm"
+      }
+    },
+    "binary_sensor": {
+      "connection": {
+        "name": "Connection"
+      },
+      "status": {
+        "name": "Status"
+      }
+    },
+    "sensor": {
+      "contract_id": {
+        "name": "Contract ID"
+      },
+      "gateway_id": {
+        "name": "Gateway ID"
+      },
+      "latest_event": {
+        "name": "Latest event"
+      },
+      "battery": {
+        "name": "Battery"
+      },
+      "signal_wifi": {
+        "name": "Wi-Fi signal"
+      },
+      "device_temperature": {
+        "name": "Temperature"
+      }
+    }
+  }
+}

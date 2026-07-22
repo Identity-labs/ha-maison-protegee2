@@ -1,0 +1,157 @@
+// Reverse-engineered from com.orange.fr.protegee2 v5.9 (com.orange.erable.services.*)
+// Field numbers match decompiled GeneratedMessageLite classes.
+syntax = "proto3";
+
+package com.orange.erable.services;
+
+option py_generic_services = true;
+
+message AuthentificationToken {
+  string accessToken = 1;
+  string refreshToken = 2;
+  string customerId = 3;
+}
+
+message AuthenticationRequest {
+  string customerId = 1;
+  string password = 2;
+}
+
+message AuthenticationResponse {
+  string status = 1;
+  string message = 2;
+  AuthentificationToken result = 3;
+}
+
+message Gateway {
+  string gatewayId = 1;
+  string gatewayType = 2;
+}
+
+message ContractDetailsResult {
+  string contractId = 1;
+  string status = 2;
+  string statusDate = 3;
+  string seller = 4;
+  string subscriptionDate = 5;
+  string subscriptionName = 6;
+  Gateway gateway = 8;
+}
+
+message ContractInfoListRequest {
+  AuthentificationToken authentificationToken = 1;
+  string username = 2;
+}
+
+message ContractInfoResponse {
+  string status = 1;
+  string message = 2;
+  repeated ContractDetailsResult result = 3;
+}
+
+message SystemStateQueryRequest {
+  AuthentificationToken authentificationToken = 1;
+  string gatewayId = 2;
+}
+
+message SystemStateQueryResult {
+  string status = 1;
+  string mode = 2;
+  int32 delay = 3;
+}
+
+message SystemStateQueryResponse {
+  string status = 1;
+  string message = 2;
+  SystemStateQueryResult result = 3;
+}
+
+message GatewayCommandRequest {
+  AuthentificationToken authentificationToken = 1;
+  string idGateway = 2;
+  string status = 3;
+  string mode = 4;
+}
+
+message GatewayCommandResult {
+  string status = 1;
+  string mode = 2;
+  int32 delay = 3;
+}
+
+message GatewayCommandResponse {
+  string status = 1;
+  string message = 2;
+  GatewayCommandResult result = 3;
+}
+
+message Attributes {
+  string temperature = 1;
+  string status = 2;
+  int32 battery = 3;
+  int32 signalWifi = 4;
+  string privacyMode = 5;
+}
+
+message Parameteres {
+  string statusMode = 1;
+  string temporisation = 2;
+}
+
+message EquipmentResult {
+  string model = 1;
+  string deviceId = 2;
+  string intitule = 3;
+  Attributes attributes = 4;
+  Parameteres parameters = 5;
+  string locationDetail = 6;
+  string connection = 7;
+  string scene = 8;
+}
+
+message EquipmentListResult {
+  string location = 1;
+  repeated EquipmentResult equipmenList = 2;
+  string temperature = 3;
+}
+
+message EquipmentListQueryRequest {
+  string authorizationHeader = 1;
+  string contractId = 2;
+  int32 equipementType = 3;
+}
+
+message EquipmentListQueryResponse {
+  string status = 1;
+  string message = 2;
+  repeated EquipmentListResult equipmentListResult = 3;
+}
+
+message EventResult {
+  string eventId = 1;
+  string dateTime = 2;
+  string user = 3;
+  string type = 4;
+  string source = 8;
+}
+
+message EventListQueryRequest {
+  string contractId = 1;
+  string limit = 2;
+  string token = 3;
+}
+
+message EventListQueryResponse {
+  string status = 1;
+  string message = 2;
+  repeated EventResult eventList = 3;
+}
+
+service LsService {
+  rpc authenticate(AuthenticationRequest) returns (AuthenticationResponse);
+  rpc getDefaultContract(ContractInfoListRequest) returns (ContractInfoResponse);
+  rpc getGatewayStatus(SystemStateQueryRequest) returns (SystemStateQueryResponse);
+  rpc gatewayCommand(GatewayCommandRequest) returns (GatewayCommandResponse);
+  rpc equipmentQueryList(EquipmentListQueryRequest) returns (EquipmentListQueryResponse);
+  rpc eventQueryList(EventListQueryRequest) returns (EventListQueryResponse);
+}

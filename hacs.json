@@ -1,0 +1,6 @@
+{
+  "name": "Maison Protegee (gRPC)",
+  "render_readme": true,
+  "domains": ["alarm_control_panel", "sensor"],
+  "iot_class": "Cloud Polling"
+}

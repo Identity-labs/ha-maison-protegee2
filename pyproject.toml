@@ -1,0 +1,24 @@
+[project]
+name = "ha-maison-protegee2"
+version = "0.1.0"
+description = "Python client for Orange Maison Protégée (reverse-engineered gRPC API)"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "grpcio>=1.62.0",
+    "protobuf>=4.25.0",
+]
+
+[project.optional-dependencies]
+dev = ["grpcio-tools>=1.62.0"]
+
+[project.scripts]
+maison-protegee = "maison_protegee.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["maison_protegee*"]

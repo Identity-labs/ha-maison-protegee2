@@ -1,0 +1,18 @@
+DOMAIN = "maison_protegee"
+DEFAULT_TIMEOUT = 60
+
+CONF_ENABLE_ALARM_PANEL = "enable_alarm_panel"
+CONF_ENABLE_TEMPERATURES = "enable_temperatures"
+CONF_ENABLE_EQUIPMENT = "enable_equipment"
+CONF_ENABLE_EVENTS = "enable_events"
+CONF_ENABLE_DIAGNOSTICS = "enable_diagnostics"
+
+CONF_SCAN_INTERVAL_ALARM = "scan_interval_alarm"
+CONF_SCAN_INTERVAL_EVENTS = "scan_interval_events"
+CONF_SCAN_INTERVAL_TEMPERATURES = "scan_interval_temperatures"
+
+DEFAULT_SCAN_INTERVAL_ALARM = 30
+DEFAULT_SCAN_INTERVAL_EVENTS = 60
+DEFAULT_SCAN_INTERVAL_TEMPERATURES = 600
+
+MANUFACTURER = "Orange"
