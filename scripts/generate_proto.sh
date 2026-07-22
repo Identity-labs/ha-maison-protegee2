@@ -1,9 +1,22 @@
 #!/usr/bin/env bash
 # Regenerate Python gRPC stubs from reverse-engineered proto definitions.
+#
+# Home Assistant pins protobuf==6.32.x. Generated stubs must use gencode <= that
+# runtime (ValidateProtobufRuntimeVersion). Keep grpcio-tools / protobuf in the
+# 6.x line — do not regenerate with protobuf 7.x.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PROTO_DIR="$ROOT/maison_protegee/proto"
 OUT_DIR="$ROOT/maison_protegee/generated"
+
+PB_VER="$(python3 -c 'import google.protobuf as p; print(p.__version__)')"
+PB_MAJOR="${PB_VER%%.*}"
+if [[ "$PB_MAJOR" -ge 7 ]]; then
+  echo "error: protobuf $PB_VER is too new for Home Assistant (needs <7)." >&2
+  echo "Install a 6.x toolchain, e.g.:" >&2
+  echo "  pip install 'protobuf>=6.31,<7' 'grpcio-tools>=1.70,<1.76'" >&2
+  exit 1
+fi
 
 python3 -m grpc_tools.protoc \
   -I "$PROTO_DIR" \
@@ -15,5 +28,25 @@ python3 -m grpc_tools.protoc \
 sed -i '' 's/^import erable_pb2/from . import erable_pb2/' "$OUT_DIR/erable_pb2_grpc.py" 2>/dev/null \
   || sed -i 's/^import erable_pb2/from . import erable_pb2/' "$OUT_DIR/erable_pb2_grpc.py"
 
-echo "Generated stubs in $OUT_DIR"
+echo "Generated stubs in $OUT_DIR (protobuf $PB_VER)"
+
+# Fail if gencode would reject HA's pinned runtime (protobuf==6.32.0).
+OUT_DIR="$OUT_DIR" python3 - <<'PY'
+from pathlib import Path
+import os
+import re
+text = Path(os.environ["OUT_DIR"], "erable_pb2.py").read_text()
+m = re.search(r"Protobuf Python Version:\s*([\d.]+)", text)
+if not m:
+    raise SystemExit("error: could not read gencode version from erable_pb2.py")
+gencode = tuple(int(p) for p in m.group(1).split("."))
+ha_runtime = (6, 32, 0)
+if gencode > ha_runtime:
+    raise SystemExit(
+        f"error: generated gencode {m.group(1)} is newer than Home Assistant "
+        f"protobuf 6.32.0. Re-run with protobuf==6.32.0 and grpcio-tools==1.75.1."
+    )
+print(f"gencode {m.group(1)} OK for HA runtime 6.32.0")
+PY
+
 "$ROOT/scripts/sync_ha_lib.sh"
