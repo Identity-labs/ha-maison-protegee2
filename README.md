@@ -119,7 +119,7 @@ The gRPC client is **vendored** under `custom_components/maison_protegee/lib/` s
 
 ### Install
 
-**HACS (recommended)** — add this repo as a custom repository (Integration), install **Maison Protegee (gRPC)**, restart Home Assistant.
+**HACS (recommended)** — add this repo as a custom repository (Integration), install **Orange Maison Protégée**, restart Home Assistant.
 
 **Manual**
 
@@ -136,7 +136,7 @@ git clone https://github.com/identity-labs/ha-maison-protegee2.git
 ln -sfn /config/ha-maison-protegee2/custom_components/maison_protegee custom_components/maison_protegee
 ```
 
-Restart Home Assistant, then add **Maison Protegee** via Settings → Devices & services.
+Restart Home Assistant, then add **Orange Maison Protégée** via Settings → Devices & services.
 
 > If you see `Invalid handler specified` / *Le flux de configuration n'a pas pu être chargé*, the integration folder is incomplete (missing `lib/maison_protegee`) or an old `maison_protegee` custom component is conflicting. Remove any previous install, copy/sync the full `custom_components/maison_protegee` tree (including `lib/`), restart, and check Settings → System → Logs for `Error occurred loading flow for integration maison_protegee`.
 

@@ -1,6 +1,8 @@
 {
-  "name": "Maison Protegee (gRPC)",
+  "name": "Orange Maison Protégée",
   "render_readme": true,
-  "domains": ["alarm_control_panel", "sensor"],
-  "iot_class": "Cloud Polling"
+  "country": "FR",
+  "domains": ["alarm_control_panel", "binary_sensor", "sensor"],
+  "iot_class": "Cloud Polling",
+  "homeassistant": "2024.8.0"
 }

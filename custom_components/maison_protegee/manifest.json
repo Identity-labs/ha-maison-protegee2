@@ -1,6 +1,6 @@
 {
   "domain": "maison_protegee",
-  "name": "Maison Protegee",
+  "name": "Orange Maison Protégée",
   "codeowners": ["@identity-labs"],
   "config_flow": true,
   "dependencies": [],
