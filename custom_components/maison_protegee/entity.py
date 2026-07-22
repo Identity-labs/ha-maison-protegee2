@@ -10,6 +10,25 @@ from .api import EquipmentDevice, MaisonProtegeeAPI
 from .const import DOMAIN, MANUFACTURER
 
 
+def format_equipment_name(device: EquipmentDevice) -> str:
+    """Build a unique, human-readable device name.
+
+    Many Orange devices share the same intitulé (e.g. several
+    "Détecteur de mouvement"); disambiguate with location / detail.
+    """
+    base = (device.name or "").strip() or device.device_id
+    location = (device.location or "").strip()
+    detail = (device.location_detail or "").strip()
+
+    if location and detail:
+        return f"{base} ({location} — {detail})"
+    if detail:
+        return f"{base} ({detail})"
+    if location:
+        return f"{base} ({location})"
+    return base
+
+
 def build_device_info(api: MaisonProtegeeAPI, entry: ConfigEntry) -> DeviceInfo:
     """Build the hub device entry for the contract/gateway."""
     gateway_id = api.gateway_id
@@ -35,15 +54,20 @@ def build_equipment_device_info(
 ) -> DeviceInfo:
     """Build a device registry entry for a single piece of equipment."""
     hub_id = api.hub_identifier
-    suggested_area = device.location_detail or device.location or None
+
+    # The control panel is listed in equipment with the same deviceId as the
+    # gateway — attach its entities to the hub instead of colliding.
+    if hub_id and device.device_id == hub_id:
+        return DeviceInfo(identifiers={(DOMAIN, hub_id)})
 
     return DeviceInfo(
         identifiers={(DOMAIN, device.device_id)},
-        name=device.name,
+        name=format_equipment_name(device),
         manufacturer=MANUFACTURER,
         model=device.model or "Equipment",
-        via_device={(DOMAIN, hub_id)} if hub_id else None,
-        suggested_area=suggested_area,
+        via_device=(DOMAIN, hub_id) if hub_id else None,
+        suggested_area=device.location or None,
+        serial_number=device.device_id,
     )
 
 

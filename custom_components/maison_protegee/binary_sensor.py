@@ -19,6 +19,7 @@ _LOGGER = logging.getLogger(__name__)
 
 _ONLINE_VALUES = frozenset({"online"})
 _ACTIVE_VALUES = frozenset({"active"})
+_BOOL_MODE_VALUES = frozenset({"true", "false", "1", "0"})
 
 
 async def async_setup_entry(
@@ -42,6 +43,16 @@ async def async_setup_entry(
         if device.status and device.status.lower() in _ACTIVE_VALUES | {"inactive"}:
             entities.append(
                 MaisonProtegeeStatusBinarySensor(coordinator, entry, api, device)
+            )
+        # statusMode true/false is a contact state on MAG-* sensors; on PIR it
+        # is not a reliable opening signal, so only expose it for MAG models.
+        if (
+            device.status_mode
+            and device.status_mode.strip().lower() in _BOOL_MODE_VALUES
+            and "MAG" in (device.model or "").upper()
+        ):
+            entities.append(
+                MaisonProtegeeStatusModeBinarySensor(coordinator, entry, api, device)
             )
 
     _LOGGER.info("Setting up %d binary_sensor entities", len(entities))
@@ -106,3 +117,32 @@ class MaisonProtegeeStatusBinarySensor(MaisonProtegeeEquipmentEntity, BinarySens
         if device.privacy_mode:
             attrs["privacy_mode"] = device.privacy_mode
         return attrs
+
+
+class MaisonProtegeeStatusModeBinarySensor(MaisonProtegeeEquipmentEntity, BinarySensorEntity):
+    """Contact / zone state from equipment statusMode (true/false)."""
+
+    _attr_translation_key = "status_mode"
+    _attr_device_class = BinarySensorDeviceClass.OPENING
+
+    def __init__(
+        self,
+        coordinator: EquipmentCoordinator,
+        entry: ConfigEntry,
+        api: MaisonProtegeeAPI,
+        device: EquipmentDevice,
+    ) -> None:
+        super().__init__(coordinator, entry, api, device)
+        self._attr_unique_id = f"{entry.entry_id}_{device.device_id}_status_mode"
+
+    @property
+    def is_on(self) -> bool | None:
+        device = self._get_device()
+        if device is None or not device.status_mode:
+            return None
+        value = device.status_mode.strip().lower()
+        if value in {"true", "1"}:
+            return True
+        if value in {"false", "0"}:
+            return False
+        return None

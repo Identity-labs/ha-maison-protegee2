@@ -6,10 +6,10 @@ from typing import Any
 from homeassistant.components.alarm_control_panel import (
     AlarmControlPanelEntity,
     AlarmControlPanelEntityFeature,
+    AlarmControlPanelState,
     CodeFormat,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -49,6 +49,11 @@ class MaisonProtegeeAlarmPanel(MaisonProtegeeEntity, AlarmControlPanelEntity):
 
     _attr_code_arm_required = False
     _attr_code_format = CodeFormat.NUMBER
+    # DISARM is always available; it is not an AlarmControlPanelEntityFeature.
+    _attr_supported_features = (
+        AlarmControlPanelEntityFeature.ARM_HOME
+        | AlarmControlPanelEntityFeature.ARM_AWAY
+    )
 
     def __init__(
         self,
@@ -62,21 +67,15 @@ class MaisonProtegeeAlarmPanel(MaisonProtegeeEntity, AlarmControlPanelEntity):
         self._attr_translation_key = "alarm_panel"
 
     @property
-    def supported_features(self) -> AlarmControlPanelEntityFeature:
-        return (
-            AlarmControlPanelEntityFeature.ARM_HOME
-            | AlarmControlPanelEntityFeature.ARM_AWAY
-            | AlarmControlPanelEntityFeature.DISARM
-        )
+    def available(self) -> bool:
+        data = self.coordinator.data or {}
+        return bool(data.get("available")) and data.get("gateway_state") is not None
 
     @property
-    def alarm_state(self) -> str | None:
-        data = self.coordinator.data
-        if not data.get("available"):
-            return STATE_UNAVAILABLE
-        state = data.get("gateway_state")
+    def alarm_state(self) -> AlarmControlPanelState | None:
+        state = (self.coordinator.data or {}).get("gateway_state")
         if state is None:
-            return STATE_UNAVAILABLE
+            return None
         return MaisonProtegeeAPI.map_gateway_to_ha_state(state)
 
     async def async_alarm_disarm(self, code: str | None = None) -> None:

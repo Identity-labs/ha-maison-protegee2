@@ -54,6 +54,9 @@
       },
       "status": {
         "name": "Status"
+      },
+      "status_mode": {
+        "name": "Opening"
       }
     },
     "sensor": {

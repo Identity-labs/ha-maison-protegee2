@@ -304,23 +304,18 @@ class MaisonProtegeeAPI:
         )
 
     @staticmethod
-    def map_gateway_to_ha_state(state: GatewayState) -> str:
-        """Map gRPC gateway state to HA alarm_control_panel state."""
-        from homeassistant.const import (
-            STATE_ALARM_ARMED_AWAY,
-            STATE_ALARM_ARMED_HOME,
-            STATE_ALARM_DISARMED,
-            STATE_ALARM_PENDING,
-        )
+    def map_gateway_to_ha_state(state: GatewayState):
+        """Map gRPC gateway state to HA AlarmControlPanelState."""
+        from homeassistant.components.alarm_control_panel import AlarmControlPanelState
 
         if state.delay and state.delay > 0:
-            return STATE_ALARM_PENDING
+            return AlarmControlPanelState.PENDING
         if state.status == AlarmStatus.ACTIVE.value:
             if state.mode == "total":
-                return STATE_ALARM_ARMED_AWAY
+                return AlarmControlPanelState.ARMED_AWAY
             if state.mode == "partial":
-                return STATE_ALARM_ARMED_HOME
-        return STATE_ALARM_DISARMED
+                return AlarmControlPanelState.ARMED_HOME
+        return AlarmControlPanelState.DISARMED
 
     @staticmethod
     def _parse_temperature(value: str) -> float | None:
