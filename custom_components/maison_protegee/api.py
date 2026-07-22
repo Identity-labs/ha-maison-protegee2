@@ -268,8 +268,9 @@ class MaisonProtegeeAPI:
                 privacy_mode: str | None = None
 
                 if attrs is not None:
+                    # Orange reports battery on a 0–10 scale (10 = 100%).
                     if attrs.battery > 0:
-                        battery = attrs.battery
+                        battery = min(int(attrs.battery) * 10, 100)
                     if attrs.signalWifi > 0:
                         signal_wifi = attrs.signalWifi
                     if attrs.status.strip():

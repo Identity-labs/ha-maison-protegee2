@@ -9,5 +9,5 @@
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/identity-labs/ha-maison-protegee2/issues",
   "requirements": ["grpcio>=1.62.0"],
-  "version": "2.2.5"
+  "version": "2.2.6"
 }
