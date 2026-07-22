@@ -306,16 +306,21 @@ class MaisonProtegeeAPI:
 
     @staticmethod
     def map_gateway_to_ha_state(state: GatewayState):
-        """Map gRPC gateway state to HA AlarmControlPanelState."""
+        """Map gRPC gateway state to HA AlarmControlPanelState.
+
+        ``delay`` is the configured exit/entry temporisation (seconds), not a
+        live countdown — do not treat delay>0 as PENDING or the panel stays
+        stuck on "En attente" while already armed.
+        """
         from homeassistant.components.alarm_control_panel import AlarmControlPanelState
 
-        if state.delay and state.delay > 0:
-            return AlarmControlPanelState.PENDING
         if state.status == AlarmStatus.ACTIVE.value:
             if state.mode == "total":
                 return AlarmControlPanelState.ARMED_AWAY
             if state.mode == "partial":
                 return AlarmControlPanelState.ARMED_HOME
+            # Active without a known mode — still armed.
+            return AlarmControlPanelState.ARMED_AWAY
         return AlarmControlPanelState.DISARMED
 
     @staticmethod
