@@ -73,6 +73,7 @@ ha-maison-protegee2/
 │   └── generated/            # protoc output (erable_pb2*.py)
 ├── custom_components/
 │   └── maison_protegee/      # Home Assistant integration (gRPC)
+│       └── lib/maison_protegee/  # Vendored client (sync via scripts/sync_ha_lib.sh)
 ├── scripts/
 │   ├── generate_proto.sh     # Regenerate stubs after proto edits
 │   ├── extract_apk_urls.py   # Static APK string extraction
@@ -114,22 +115,30 @@ The full decompiled APK (~200 MB) can stay in the sibling `ha/` workspace folder
 
 A custom component is included, mirroring [ha-maison-protegee](https://github.com/identity-labs/ha-maison-protegee) but using the gRPC client instead of web scraping.
 
+The gRPC client is **vendored** under `custom_components/maison_protegee/lib/` so a normal HACS / folder install works without `pip install` into Home Assistant’s venv. After editing the root `maison_protegee/` package, run `./scripts/sync_ha_lib.sh`.
+
 ### Install
 
+**HACS (recommended)** — add this repo as a custom repository (Integration), install **Maison Protegee (gRPC)**, restart Home Assistant.
+
+**Manual**
+
 ```bash
-# Clone into your HA config directory
+# Copy only the integration folder into HA config
+cp -R custom_components/maison_protegee /config/custom_components/
+```
+
+Or clone + symlink (also works; bootstrap finds the repo-root package):
+
+```bash
 cd /config
 git clone https://github.com/identity-labs/ha-maison-protegee2.git
-
-# Symlink the integration
 ln -sfn /config/ha-maison-protegee2/custom_components/maison_protegee custom_components/maison_protegee
-
-# Install the Python client into Home Assistant's venv
-docker exec -it homeassistant pip install -e /config/ha-maison-protegee2
-# or on HA OS / venv: pip install -e /config/ha-maison-protegee2
 ```
 
 Restart Home Assistant, then add **Maison Protegee** via Settings → Devices & services.
+
+> If you see `Invalid handler specified` / *Le flux de configuration n'a pas pu être chargé*, the integration folder is incomplete (missing `lib/maison_protegee`) or an old `maison_protegee` custom component is conflicting. Remove any previous install, copy/sync the full `custom_components/maison_protegee` tree (including `lib/`), restart, and check Settings → System → Logs for `Error occurred loading flow for integration maison_protegee`.
 
 ### Entities (v2)
 
