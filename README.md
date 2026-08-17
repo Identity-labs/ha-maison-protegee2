@@ -1,74 +1,128 @@
-# ha-maison-protegee2
+# Orange Maison Protégée for Home Assistant
 
-Home Assistant custom component for **Orange Maison Protégée**, using the reverse-engineered gRPC client in [ha-maison-protegee2-api](https://github.com/Identity-labs/ha-maison-protegee2-api).
+<p align="center">
+  <a href="https://telesurveillance.orange.fr">
+    <img src="images/logo_maison_protegee.png" alt="Orange Maison Protégée — Alarme et Télésurveillance" width="420">
+  </a>
+</p>
 
-Until that package is published on PyPI, this integration vendors a copy under `custom_components/maison_protegee/lib/`. After API changes, run `./scripts/sync_ha_lib.sh`. Once published, `ha-maison-protegee2-api` will be declared in `manifest.json` requirements.
+Unofficial Home Assistant integration for **[Orange Maison Protégée](https://telesurveillance.orange.fr)**, Orange’s connected home-security offer in France.
 
-Do not install alongside the legacy [ha-maison-protegee](https://github.com/identity-labs/ha-maison-protegee) integration — both use domain `maison_protegee`.
+<p align="center">
+  <a href="https://my.home-assistant.io/redirect/hacs_repository/?owner=Identity-labs&repository=ha-maison-protegee2&category=integration">
+    <img src="https://my.home-assistant.io/badges/hacs_repository.svg" alt="Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.">
+  </a>
+</p>
 
-## Install
+Use the same account as the official mobile app. Arm and disarm the alarm, follow sensors around the house, and react to events in automations — without opening the Orange app.
 
-**HACS (recommended)** — add this repo as a custom repository (Integration), install **Orange Maison Protégée**, restart Home Assistant.
+Do not install this alongside the legacy [ha-maison-protegee](https://github.com/Identity-labs/ha-maison-protegee) integration: both use the same domain.
 
-**Manual**
+## What is Orange Maison Protégée?
 
-```bash
-# Copy only the integration folder into HA config
-cp -R custom_components/maison_protegee /config/custom_components/
-```
+<p align="center">
+  <img src="images/equipement_orange_maison_protegee.png" alt="Orange Maison Protégée hub, keypad, sensors, badges and mobile app" width="800">
+</p>
 
-Or clone + symlink:
+Maison Protégée is Orange’s home alarm and 24/7 telesurveillance service. A hub in the house talks to door/window contacts, motion detectors, the keypad, and other wireless equipment. From the official app you can:
 
-```bash
-cd /config
-git clone https://github.com/Identity-labs/ha-maison-protegee2.git
-ln -sfn /config/ha-maison-protegee2/custom_components/maison_protegee custom_components/maison_protegee
-```
+- Arm the system in **total** mode (everyone away) or **partial** mode (people still at home)
+- Disarm the system
+- See the status of each device (battery, connection, openings, temperatures)
+- Read the event log (arm, disarm, detections, faults)
 
-Restart Home Assistant, then add **Orange Maison Protégée** via Settings → Devices & services.
+This integration brings that same system into Home Assistant so the alarm and its devices sit next to your lights, presence, and automations.
 
-> If you see `Invalid handler specified` / *Le flux de configuration n'a pas pu être chargé*, the integration folder is incomplete (missing `lib/maison_protegee`) or an old `maison_protegee` custom component is conflicting. Remove any previous install, copy/sync the full `custom_components/maison_protegee` tree (including `lib/`), restart, and check Settings → System → Logs for `Error occurred loading flow for integration maison_protegee`.
+It is **not** an official Orange product. Cameras (live video) from the Orange app are not included.
 
-## Entities
+## What you can do with this component
 
-| Platform | Entity | Description |
-|----------|--------|-------------|
-| `alarm_control_panel` | Alarm | Total = arm away, partial = arm home, disarm |
-| `sensor` | Room temperatures | Per-zone °C from equipment API |
-| `sensor` | Latest event | Most recent log entry |
-| `sensor` | Contract / Gateway ID | Diagnostics |
+After login, Home Assistant creates one hub device for the contract and a device for each piece of equipment (named with its room when Orange provides one).
 
-**Device registry:** one Orange hub device groups all entities.
+### Alarm
 
-**Automations:** listen for `maison_protegee_event` (includes `event_id`, `event_type`, `message`, …).
+A standard **alarm control panel**:
 
-**Services:** use standard `alarm_control_panel` services — `alarm_arm_away`, `alarm_arm_home`, `alarm_disarm`.
+| In Home Assistant | In the Orange app |
+|-------------------|-------------------|
+| Arm away | Total (full protection) |
+| Arm home | Partial (night / at home) |
+| Disarm | Disarm |
+
+Use the usual services `alarm_control_panel.alarm_arm_away`, `alarm_arm_home`, and `alarm_disarm`, or the alarm card on a dashboard.
+
+If the contract has no hub installed yet, the panel is not created; equipment and events can still appear.
+
+### Equipment
+
+For each compatible device, depending on what Orange reports:
+
+- **Battery** level
+- **Wi-Fi / radio signal**
+- **Temperature** (°C), when the device has a sensor
+- **Connection** (online / offline)
+- **Status** (active / inactive)
+- **Opening** on magnetic door/window contacts (MAG)
+
+Devices show up in the device registry, so you can attach them to areas and mix them into dashboards.
+
+### Events
+
+- A **latest event** sensor with the most recent log line from the system
+- A Home Assistant bus event `maison_protegee_event` for each new log entry (`event_id`, `event_type`, `date_time`, `user`, `source`, `message`)
+
+Typical uses: notify when the alarm is armed, when a door opens, or when a detector fires.
+
+### Diagnostics
+
+Optional sensors for **contract ID** and **gateway ID**, useful for support and to confirm the right installation is linked.
 
 ### Options
 
-Toggle alarm panel, temperatures, events, and diagnostic sensors independently.
+In the integration options you can turn these groups on or off independently:
 
-### Alarm commands
+- Alarm panel
+- Equipment sensors
+- Events
+- Diagnostics
 
-| Action | HA service | API mode / status |
-|--------|------------|-------------------|
-| Arm total | `alarm_arm_away` | `total` / `active` |
-| Arm partial | `alarm_arm_home` | `partial` / `active` |
-| Disarm | `alarm_disarm` | empty / `inactive` |
+You can also update the Orange credentials there.
 
-## Development
+## Installation
 
-The gRPC client, protobuf, CLI, and reverse-engineering scripts live in [ha-maison-protegee2-api](https://github.com/Identity-labs/ha-maison-protegee2-api). Clone it next to this repo:
+### HACS
 
-```bash
-../ha-maison-protegee2-api/   # Python package (src/maison_protegee)
-./                            # this Home Assistant integration
-./scripts/sync_ha_lib.sh      # copy API package → custom_components/.../lib/
-```
+This integration is available in HACS. Open the button below (HACS must already be installed), then download **Orange Maison Protégée** and restart Home Assistant.
+
+<p align="center">
+  <a href="https://my.home-assistant.io/redirect/hacs_repository/?owner=Identity-labs&repository=ha-maison-protegee2&category=integration">
+    <img src="https://my.home-assistant.io/badges/hacs_repository.svg" alt="Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.">
+  </a>
+</p>
+
+Or in Home Assistant: **HACS → Integrations → Orange Maison Protégée → Download**.
+
+### Manual
+
+Copy `custom_components/maison_protegee` into your Home Assistant `custom_components` folder and restart.
+
+## Setup
+
+1. Restart Home Assistant after installing.
+2. Go to **Settings → Devices & services → Add integration**.
+3. Search for **Orange Maison Protégée**.
+4. Enter the same customer ID / email and password as the mobile app.
+
+<p align="center">
+  <a href="https://my.home-assistant.io/redirect/config_flow_start/?domain=maison_protegee">
+    <img src="https://my.home-assistant.io/badges/config_flow_start.svg" alt="Open your Home Assistant instance and start setting up a new integration.">
+  </a>
+</p>
+
+If setup fails with *Invalid handler specified*, remove any leftover `maison_protegee` custom component, restart, and check **Settings → System → Logs**.
 
 ## Limitations
 
-- Unofficial API — may break on app updates
-- Token refresh re-logs in when JWT is near expiry
-- Cameras use a separate WebRTC/signaling stack (`protectline.fr`)
-- Use at your own risk; respect Orange ToS
+- Unofficial — Orange may change the service at any time
+- Live cameras from the Orange app are not supported
+- Use at your own risk and respect Orange’s terms of service

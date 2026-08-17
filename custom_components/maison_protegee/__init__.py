@@ -7,11 +7,8 @@ from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
 from homeassistant.core import Event, HomeAssistant, callback
 
 from .api import MaisonProtegeeAPI
-from .bootstrap import setup_import_path
 from .const import DOMAIN
 from .coordinator import EquipmentCoordinator, EventsCoordinator, GatewayCoordinator
-
-setup_import_path()
 
 _LOGGER = logging.getLogger(__name__)
 

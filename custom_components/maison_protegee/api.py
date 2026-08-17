@@ -9,13 +9,9 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
-from .bootstrap import setup_import_path
-
-setup_import_path()
-
-from maison_protegee.client import MaisonProtegeeClient  # noqa: E402
-from maison_protegee.exceptions import ApiError, AuthenticationError  # noqa: E402
-from maison_protegee.models import AlarmStatus, GatewayState, SessionInfo  # noqa: E402
+from maison_protegee.client import MaisonProtegeeClient
+from maison_protegee.exceptions import ApiError, AuthenticationError
+from maison_protegee.models import AlarmStatus, GatewayState, SessionInfo
 
 _LOGGER = logging.getLogger(__name__)
 

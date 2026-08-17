@@ -9,8 +9,9 @@ from homeassistant import config_entries
 from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 
+from maison_protegee.exceptions import ApiError, AuthenticationError
+
 from .api import MaisonProtegeeAPI
-from .bootstrap import setup_import_path
 from .const import (
     CONF_ENABLE_ALARM_PANEL,
     CONF_ENABLE_DIAGNOSTICS,
@@ -18,10 +19,6 @@ from .const import (
     CONF_ENABLE_EVENTS,
     DOMAIN,
 )
-
-setup_import_path()
-
-from maison_protegee.exceptions import ApiError, AuthenticationError  # noqa: E402
 
 _LOGGER = logging.getLogger(__name__)
 
