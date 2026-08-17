@@ -1,4 +1,4 @@
-"""Make the repo-root maison_protegee package importable from Home Assistant."""
+"""Make the maison_protegee API package importable from Home Assistant."""
 
 from __future__ import annotations
 
@@ -7,14 +7,14 @@ from pathlib import Path
 
 
 def setup_import_path() -> None:
-    """Prefer the bundled lib/, then repo root, then an already-installed package."""
+    """Prefer the bundled lib/, then an installed ha-maison-protegee2-api package."""
     component_dir = Path(__file__).resolve().parent
-    for root in (component_dir / "lib", component_dir.parent.parent):
-        if (root / "maison_protegee" / "client.py").is_file():
-            root_str = str(root)
-            if root_str not in sys.path:
-                sys.path.insert(0, root_str)
-            return
+    bundled = component_dir / "lib"
+    if (bundled / "maison_protegee" / "client.py").is_file():
+        root_str = str(bundled)
+        if root_str not in sys.path:
+            sys.path.insert(0, root_str)
+        return
 
     try:
         import maison_protegee
@@ -28,6 +28,6 @@ def setup_import_path() -> None:
     raise ImportError(
         "maison_protegee package not found. Expected "
         "custom_components/maison_protegee/lib/maison_protegee/ "
-        "(run scripts/sync_ha_lib.sh), or install with "
-        "'pip install -e .' from the ha-maison-protegee2 repo root."
+        "(run scripts/sync_ha_lib.sh from ha-maison-protegee2), or install "
+        "ha-maison-protegee2-api."
     )
