@@ -62,7 +62,7 @@ For each compatible device, depending on what Orange reports:
 - **Temperature** (°C), when the device has a sensor
 - **Connection** (online / offline)
 - **Status** (active / inactive)
-- **Opening** on magnetic door/window contacts (MAG)
+- **Home mode** (`statusMode`): whether the device is included when arming Mode à la maison. This is not door open/closed; MAG-SHOCK contact is not available live.
 
 Devices show up in the device registry, so you can attach them to areas and mix them into dashboards.
 

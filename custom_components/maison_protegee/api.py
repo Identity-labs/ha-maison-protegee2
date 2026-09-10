@@ -286,6 +286,7 @@ class MaisonProtegeeAPI:
                         location_detail=eq.locationDetail.strip(),
                         connection=eq.connection.strip(),
                         scene=eq.scene.strip(),
+                        # Home-mode inclusion toggle, not magnet open/closed.
                         status_mode=params.statusMode.strip() if params else "",
                         battery=battery,
                         signal_wifi=signal_wifi,

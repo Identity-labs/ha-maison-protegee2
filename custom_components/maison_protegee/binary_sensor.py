@@ -44,12 +44,11 @@ async def async_setup_entry(
             entities.append(
                 MaisonProtegeeStatusBinarySensor(coordinator, entry, api, device)
             )
-        # statusMode true/false is a contact state on MAG-* sensors; on PIR it
-        # is not a reliable opening signal, so only expose it for MAG models.
+        # statusMode is Orange's "include this device in Mode à la maison"
+        # flag (true/false), not magnet open/closed.
         if (
             device.status_mode
             and device.status_mode.strip().lower() in _BOOL_MODE_VALUES
-            and "MAG" in (device.model or "").upper()
         ):
             entities.append(
                 MaisonProtegeeStatusModeBinarySensor(coordinator, entry, api, device)
@@ -120,10 +119,9 @@ class MaisonProtegeeStatusBinarySensor(MaisonProtegeeEquipmentEntity, BinarySens
 
 
 class MaisonProtegeeStatusModeBinarySensor(MaisonProtegeeEquipmentEntity, BinarySensorEntity):
-    """Contact / zone state from equipment statusMode (true/false)."""
+    """Whether this device is included when arming Mode à la maison."""
 
     _attr_translation_key = "status_mode"
-    _attr_device_class = BinarySensorDeviceClass.OPENING
 
     def __init__(
         self,

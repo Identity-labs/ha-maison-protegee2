@@ -1,0 +1,81 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Orange Maison Protégée",
+        "description": "Connectez-vous avec les mêmes identifiants que l’application mobile (API gRPC).",
+        "data": {
+          "username": "Identifiant client ou e-mail",
+          "password": "Mot de passe",
+          "enable_alarm_panel": "Panneau d’alarme (nécessite une passerelle)",
+          "enable_equipment": "Batterie, signal, température, connexion et statut par équipement",
+          "enable_events": "Capteur du dernier événement + événements bus",
+          "enable_diagnostics": "Capteurs de diagnostic contrat et passerelle"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Impossible de se connecter. Vérifiez le réseau.",
+      "invalid_auth": "Identifiants invalides.",
+      "password_required": "Le mot de passe est requis.",
+      "no_contract": "Connexion réussie mais aucun contrat n’a été trouvé.",
+      "unknown": "Erreur inattendue."
+    },
+    "abort": {
+      "already_configured": "Déjà configuré."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Options Orange Maison Protégée",
+        "data": {
+          "username": "Identifiant client ou e-mail",
+          "password": "Mot de passe (laisser vide pour conserver l’actuel)",
+          "enable_alarm_panel": "Panneau d’alarme",
+          "enable_equipment": "Capteurs d’équipement (batterie, signal, température, statut)",
+          "enable_events": "Capteur d’événements + événements bus",
+          "enable_diagnostics": "Capteurs de diagnostic"
+        }
+      }
+    }
+  },
+  "entity": {
+    "alarm_control_panel": {
+      "alarm_panel": {
+        "name": "Alarme"
+      }
+    },
+    "binary_sensor": {
+      "connection": {
+        "name": "Connexion"
+      },
+      "status": {
+        "name": "Statut"
+      },
+      "status_mode": {
+        "name": "Mode à la maison"
+      }
+    },
+    "sensor": {
+      "contract_id": {
+        "name": "ID contrat"
+      },
+      "gateway_id": {
+        "name": "ID passerelle"
+      },
+      "latest_event": {
+        "name": "Dernier événement"
+      },
+      "battery": {
+        "name": "Batterie"
+      },
+      "signal_wifi": {
+        "name": "Signal Wi-Fi"
+      },
+      "device_temperature": {
+        "name": "Température"
+      }
+    }
+  }
+}
