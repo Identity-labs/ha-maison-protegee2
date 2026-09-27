@@ -7,7 +7,6 @@ from homeassistant.components.alarm_control_panel import (
     AlarmControlPanelEntity,
     AlarmControlPanelEntityFeature,
     AlarmControlPanelState,
-    CodeFormat,
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -47,8 +46,7 @@ async def async_setup_entry(
 class MaisonProtegeeAlarmPanel(MaisonProtegeeEntity, AlarmControlPanelEntity):
     """Maison Protégée alarm with total (away) and partial (home) modes."""
 
-    _attr_code_arm_required = False
-    _attr_code_format = CodeFormat.NUMBER
+    # Leave code_format unset so the panel does not prompt. The PIN is unused.
     # DISARM is always available; it is not an AlarmControlPanelEntityFeature.
     _attr_supported_features = (
         AlarmControlPanelEntityFeature.ARM_HOME
