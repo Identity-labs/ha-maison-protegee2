@@ -46,7 +46,9 @@ async def async_setup_entry(
 class MaisonProtegeeAlarmPanel(MaisonProtegeeEntity, AlarmControlPanelEntity):
     """Maison Protégée alarm with total (away) and partial (home) modes."""
 
-    # Leave code_format unset so the panel does not prompt. The PIN is unused.
+    # Default is True: Home Assistant rejects arm calls that omit a code.
+    # Leave code_format unset so the card does not prompt. The PIN is unused.
+    _attr_code_arm_required = False
     # DISARM is always available; it is not an AlarmControlPanelEntityFeature.
     _attr_supported_features = (
         AlarmControlPanelEntityFeature.ARM_HOME
