@@ -14,7 +14,7 @@ Custom component in `custom_components/maison_protegee/`. The gRPC client is **n
 Declare the dependency in `custom_components/maison_protegee/manifest.json`:
 
 ```json
-"requirements": ["ha-maison-protegee2-api>=0.1.0"]
+"requirements": ["ha-maison-protegee2-api>=0.1.2"]
 ```
 
 Import `maison_protegee` directly (Home Assistant installs requirements before loading the integration). Do not vendor the client under `lib/` and do not add a `sys.path` bootstrap.

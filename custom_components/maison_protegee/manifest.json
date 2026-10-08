@@ -11,7 +11,7 @@
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/identity-labs/ha-maison-protegee2/issues",
   "requirements": [
-    "ha-maison-protegee2-api>=0.1.1"
+    "ha-maison-protegee2-api>=0.1.2"
   ],
-  "version": "2.2.11"
+  "version": "2.2.12"
 }
