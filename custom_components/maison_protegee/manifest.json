@@ -13,5 +13,5 @@
   "requirements": [
     "ha-maison-protegee2-api>=0.1.2"
   ],
-  "version": "2.2.12"
+  "version": "2.2.13"
 }

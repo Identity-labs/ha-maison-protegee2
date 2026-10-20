@@ -7,8 +7,9 @@ from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
 from homeassistant.core import Event, HomeAssistant, callback
 
 from .api import MaisonProtegeeAPI
-from .const import DOMAIN
+from .const import CONF_ENABLE_EQUIPMENT, DOMAIN
 from .coordinator import EquipmentCoordinator, EventsCoordinator, GatewayCoordinator
+from .entity import async_ensure_hub_device
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -57,6 +58,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         "equipment_coordinator": equipment_coordinator,
         "events_coordinator": events_coordinator,
     }
+
+    # via_device_id is a registry id, so the hub must exist before equipment
+    # entities that connect through it are added.
+    if (
+        entry.data.get(CONF_ENABLE_EQUIPMENT, True)
+        and api.hub_identifier
+        and any(
+            device.device_id != api.hub_identifier
+            for device in equipment_coordinator.data.devices
+        )
+    ):
+        async_ensure_hub_device(hass, api, entry)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True

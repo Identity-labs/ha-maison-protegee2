@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
@@ -48,8 +50,37 @@ def build_device_info(api: MaisonProtegeeAPI, entry: ConfigEntry) -> DeviceInfo:
     )
 
 
-def build_equipment_device_info(
+def async_ensure_hub_device(
+    hass: HomeAssistant,
     api: MaisonProtegeeAPI,
+    entry: ConfigEntry,
+) -> None:
+    """Register the hub so child devices can reference it by registry id."""
+    info = build_device_info(api, entry)
+    kwargs = {
+        key: info[key]
+        for key in (
+            "configuration_url",
+            "identifiers",
+            "manufacturer",
+            "model",
+            "name",
+            "serial_number",
+            "suggested_area",
+            "sw_version",
+        )
+        if info.get(key) is not None
+    }
+    dr.async_get(hass).async_get_or_create(
+        config_entry_id=entry.entry_id,
+        **kwargs,
+    )
+
+
+def build_equipment_device_info(
+    hass: HomeAssistant,
+    api: MaisonProtegeeAPI,
+    entry: ConfigEntry,
     device: EquipmentDevice,
 ) -> DeviceInfo:
     """Build a device registry entry for a single piece of equipment."""
@@ -60,14 +91,22 @@ def build_equipment_device_info(
     if hub_id and device.device_id == hub_id:
         return DeviceInfo(identifiers={(DOMAIN, hub_id)})
 
+    via_device_id = None
+    if hub_id:
+        via_device_id = dr.async_get_device_id_by_identifier(
+            hass,
+            (DOMAIN, hub_id),
+            config_entry_id=entry.entry_id,
+        )
+
     return DeviceInfo(
         identifiers={(DOMAIN, device.device_id)},
         name=format_equipment_name(device),
         manufacturer=MANUFACTURER,
         model=device.model or "Equipment",
-        via_device=(DOMAIN, hub_id) if hub_id else None,
         suggested_area=device.location or None,
         serial_number=device.device_id,
+        **({"via_device_id": via_device_id} if via_device_id else {}),
     )
 
 
@@ -99,7 +138,9 @@ class MaisonProtegeeEquipmentEntity(CoordinatorEntity):
         self._entry = entry
         self._api = api
         self._device_id = device.device_id
-        self._attr_device_info = build_equipment_device_info(api, device)
+        self._attr_device_info = build_equipment_device_info(
+            coordinator.hass, api, entry, device
+        )
 
     def _get_device(self) -> EquipmentDevice | None:
         for device in self.coordinator.data.devices:
