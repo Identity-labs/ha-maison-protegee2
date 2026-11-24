@@ -26,7 +26,12 @@ _LOGGER = logging.getLogger(__name__)
 
 
 def _interval(entry: ConfigEntry, key: str, default: int) -> timedelta:
-    return timedelta(seconds=int(entry.data.get(key, default)))
+    raw = entry.options.get(key, entry.data.get(key, default))
+    try:
+        seconds = int(raw)
+    except (TypeError, ValueError):
+        seconds = default
+    return timedelta(seconds=max(10, seconds))
 
 
 class GatewayCoordinator(DataUpdateCoordinator[dict[str, Any]]):

@@ -8,6 +8,11 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
+from homeassistant.helpers.selector import (
+    NumberSelector,
+    NumberSelectorConfig,
+    NumberSelectorMode,
+)
 
 from maison_protegee.exceptions import ApiError, AuthenticationError
 
@@ -17,6 +22,12 @@ from .const import (
     CONF_ENABLE_DIAGNOSTICS,
     CONF_ENABLE_EQUIPMENT,
     CONF_ENABLE_EVENTS,
+    CONF_SCAN_INTERVAL_ALARM,
+    CONF_SCAN_INTERVAL_EVENTS,
+    CONF_SCAN_INTERVAL_TEMPERATURES,
+    DEFAULT_SCAN_INTERVAL_ALARM,
+    DEFAULT_SCAN_INTERVAL_EVENTS,
+    DEFAULT_SCAN_INTERVAL_TEMPERATURES,
     DOMAIN,
 )
 
@@ -160,6 +171,16 @@ def _merge_options(
     updated[CONF_ENABLE_EQUIPMENT] = user_input.get(CONF_ENABLE_EQUIPMENT, True)
     updated[CONF_ENABLE_EVENTS] = user_input.get(CONF_ENABLE_EVENTS, True)
     updated[CONF_ENABLE_DIAGNOSTICS] = user_input.get(CONF_ENABLE_DIAGNOSTICS, True)
+    updated[CONF_SCAN_INTERVAL_ALARM] = _scan_seconds(
+        user_input.get(CONF_SCAN_INTERVAL_ALARM), DEFAULT_SCAN_INTERVAL_ALARM
+    )
+    updated[CONF_SCAN_INTERVAL_EVENTS] = _scan_seconds(
+        user_input.get(CONF_SCAN_INTERVAL_EVENTS), DEFAULT_SCAN_INTERVAL_EVENTS
+    )
+    updated[CONF_SCAN_INTERVAL_TEMPERATURES] = _scan_seconds(
+        user_input.get(CONF_SCAN_INTERVAL_TEMPERATURES),
+        DEFAULT_SCAN_INTERVAL_TEMPERATURES,
+    )
     # Drop legacy hub zone-temperature option; temps live on equipment devices.
     updated.pop("enable_temperatures", None)
     return updated
@@ -187,5 +208,55 @@ def _options_schema(config_entry: config_entries.ConfigEntry) -> vol.Schema:
                 CONF_ENABLE_DIAGNOSTICS,
                 default=data.get(CONF_ENABLE_DIAGNOSTICS, True),
             ): bool,
+            vol.Optional(
+                CONF_SCAN_INTERVAL_ALARM,
+                default=_stored_interval(
+                    config_entry, CONF_SCAN_INTERVAL_ALARM, DEFAULT_SCAN_INTERVAL_ALARM
+                ),
+            ): _SCAN_INTERVAL_SELECTOR,
+            vol.Optional(
+                CONF_SCAN_INTERVAL_EVENTS,
+                default=_stored_interval(
+                    config_entry,
+                    CONF_SCAN_INTERVAL_EVENTS,
+                    DEFAULT_SCAN_INTERVAL_EVENTS,
+                ),
+            ): _SCAN_INTERVAL_SELECTOR,
+            vol.Optional(
+                CONF_SCAN_INTERVAL_TEMPERATURES,
+                default=_stored_interval(
+                    config_entry,
+                    CONF_SCAN_INTERVAL_TEMPERATURES,
+                    DEFAULT_SCAN_INTERVAL_TEMPERATURES,
+                ),
+            ): _SCAN_INTERVAL_SELECTOR,
         }
     )
+
+
+_SCAN_INTERVAL_SELECTOR = NumberSelector(
+    NumberSelectorConfig(
+        min=10,
+        max=86400,
+        step=1,
+        unit_of_measurement="s",
+        mode=NumberSelectorMode.BOX,
+    )
+)
+
+
+def _stored_interval(
+    config_entry: config_entries.ConfigEntry, key: str, default: int
+) -> int:
+    """Return a saved scan interval, preferring the options dialog value."""
+    raw = config_entry.options.get(key, config_entry.data.get(key, default))
+    return _scan_seconds(raw, default)
+
+
+def _scan_seconds(raw: Any, default: int) -> int:
+    """Coerce a scan interval to a whole number of seconds."""
+    try:
+        value = int(raw)
+    except (TypeError, ValueError):
+        return default
+    return max(10, min(value, 86400))

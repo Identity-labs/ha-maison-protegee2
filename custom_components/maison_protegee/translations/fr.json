@@ -35,7 +35,15 @@
           "enable_alarm_panel": "Panneau d’alarme",
           "enable_equipment": "Capteurs d’équipement (batterie, signal, température, statut)",
           "enable_events": "Capteur d’événements + événements bus",
-          "enable_diagnostics": "Capteurs de diagnostic"
+          "enable_diagnostics": "Capteurs de diagnostic",
+          "scan_interval_alarm": "Intervalle de l’alarme",
+          "scan_interval_events": "Intervalle des événements",
+          "scan_interval_temperatures": "Intervalle des équipements"
+        },
+        "data_description": {
+          "scan_interval_alarm": "Fréquence de rafraîchissement de l’état de l’alarme. 30 secondes par défaut.",
+          "scan_interval_events": "Fréquence de rafraîchissement du journal. 60 secondes par défaut.",
+          "scan_interval_temperatures": "Fréquence de rafraîchissement des équipements, dont la température. 600 secondes par défaut."
         }
       }
     }

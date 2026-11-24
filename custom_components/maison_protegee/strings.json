@@ -35,7 +35,15 @@
           "enable_alarm_panel": "Alarm control panel",
           "enable_equipment": "Equipment sensors (battery, signal, temperature, status)",
           "enable_events": "Event sensor + bus events",
-          "enable_diagnostics": "Diagnostic sensors"
+          "enable_diagnostics": "Diagnostic sensors",
+          "scan_interval_alarm": "Alarm scan interval",
+          "scan_interval_events": "Events scan interval",
+          "scan_interval_temperatures": "Equipment scan interval"
+        },
+        "data_description": {
+          "scan_interval_alarm": "How often the alarm state is refreshed. Default 30 seconds.",
+          "scan_interval_events": "How often the event log is refreshed. Default 60 seconds.",
+          "scan_interval_temperatures": "How often equipment, including temperature, is refreshed. Default 600 seconds."
         }
       }
     }
